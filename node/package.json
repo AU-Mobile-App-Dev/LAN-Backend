@@ -1,0 +1,23 @@
+{
+  "name": "lan-project",
+  "version": "1.0.0",
+  "description": "Aurora University Intro to Mobile App Dev final project. Local Area Networking is a social media web and mobile app that allows local gamers to connect.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Rob Nice",
+  "license": "ISC",
+  "dependencies": {
+    "body-parser": "^1.15.0",
+    "connect": "^3.4.1",
+    "crypto-js": "^3.1.6",
+    "express": "^4.13.4",
+    "express-limiter": "^1.6.0",
+    "mysql": "^2.10.2",
+    "passport": "^0.3.2",
+    "randomstring": "^1.1.4",
+    "redis": "^2.4.2",
+    "siege": "^0.2.0"
+  }
+}
