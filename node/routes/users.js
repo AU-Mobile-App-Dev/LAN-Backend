@@ -1,17 +1,46 @@
 var userFunctions = require('../database/users');
 var sessions = require('../database/login-registration');
+var errorCodes = require('./error-codes.js').errorCodeHandler();
     
 module.exports = function(app){
 // =======================
 // API REQUESTS ==========
 // =======================
-app.get('/api/users', function(req,res){
-    userFunctions.getAllUsers(function(result){
-        if(result == 500){
-            res.json({500:"Internal server error"});
-        }else{res.json(result);}
-    });
+app.get('/api/users/:apikey', function(req,res){
+    sessions.verifyKey(req.params.apikey, function(result){
+        if(result){
+          userFunctions.getAllUsers(function(result){
+            if(errorCodes(result)){
+                res.json({result: errorCodes(result)});
+            }
+            else{res.json(result);}
+          });
+        }
+        else{
+         res.json({403: "Unauthenticated API request for friends list"});  
+        }
+    })
+    
 });
+
+app.get('/api/users/:username', function(req, res){
+     sessions.verifyKey(req.params.apikey, function(result){
+         if(result){
+           userFunctions.getUserByName(req.params.username, function(result){
+              if(errorCodes(result)){
+                res.json({result: errorCodes(result)});
+            }
+            else{res.json(result);}
+          });  
+         }
+         else{
+          res.json({403: "Unauthenticated API request"});   
+         }
+    
+    
+     });
+});
+
 app.get('/api/users/:username', function(req, res){
     userFunctions.getUserByName(res, req.params.username);
 });
@@ -33,18 +62,7 @@ app.get('/users/:username/friends/:session', function(req,res){
 // =======================
 // POST REQUESTS =========
 // =======================
-app.get('/users/:username/friends/token=:token', function(req,res){
-    if ( TokenGenerator.isValid( token ) ) {
-     userFunctions.getFriends(function(result){
-        if(result == 500){
-            res.json({500:"Internal server error"});
-        }else{res.json(result);}
-    });
-} else {
-    res.json({403: "Unauthenticated request"}); 
-}
-    
-});
+
 
 // =======================
 // DELETE REQUESTS =======

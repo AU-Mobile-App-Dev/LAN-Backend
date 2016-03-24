@@ -117,7 +117,8 @@ CREATE TABLE IF NOT EXISTS `users` (
   `lon` decimal(10,10) NOT NULL,
   `dob` date DEFAULT NULL,
   `status` int(11) NOT NULL,
-  `session` varchar(64) NOT NULL
+  `session` varchar(32) NOT NULL,
+  `api_key` varchar(64) NOT NULL
 ) ENGINE=InnoDB AUTO_INCREMENT=463 DEFAULT CHARSET=latin1;
 
 -- --------------------------------------------------------

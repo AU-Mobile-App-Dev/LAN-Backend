@@ -20,32 +20,21 @@ exports.getUsers = function(callback) {
     });
 }
 
-exports.getUserByName= function(res, username){
+exports.getUserByName= function(username, callback){
     connectionpool.getConnection(function (err, connection) {
         if (err) {
             console.error('CONNECTION error: ', err);
-            res.statusCode = 503;
-            res.send({
-                result: 'error',
-                err: err.code
-            });
+            callback(503);
         } else {
             connection.query("SELECT * FROM users WHERE username = ?", username, function (err, results) {
                 if (err) {
                     console.error(err);
-                    res.statusCode = 500;
-                    res.send({
-                        result: "error",
-                        json:results
-                    });
+                   callback(500);
                 }//If not results, user does not exist
                 else if (results.length == 0) {
-                    return res.send({error: 'user does not exist'});
+                    callback(204);
                 }
-                res.send({
-                    result: 'success',
-                    json: results
-                });
+                callback(results);
                 connection.release();
             });
         }

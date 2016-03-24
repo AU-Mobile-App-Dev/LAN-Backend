@@ -19,7 +19,7 @@ exports.authenticate = function(userObject, callback){
                         console.log(err);
                     }
                    if(passwordFunctions.compareStrings(userObject.password, row[0].password)){
-                       //Generate session id, insert it to the database and return in response
+                       //Generate session id, insert it to the database and return the response
                        var session = randomstring.generate();
                        setSession.setSession(session, row[0].id);
                        callback(true, session);
