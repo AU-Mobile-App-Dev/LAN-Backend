@@ -77,6 +77,9 @@ insertKey = function(key, username){
                     if (err) {
                         console.log(err);
                     }
+                    else{
+                        
+                    }
                 
                     connection.release();
                 });

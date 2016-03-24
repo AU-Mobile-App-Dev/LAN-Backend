@@ -1,49 +1,51 @@
 var userFunctions = require('../database/users');
 var sessions = require('../database/login-registration');
-var errorCodes = require('./error-codes.js').errorCodeHandler();
+var errorCodes = require('./error-codes.js');
     
 module.exports = function(app){
 // =======================
 // API REQUESTS ==========
 // =======================
-app.get('/api/users/:apikey', function(req,res){
+
+app.get('/api/users/api=:apikey', function(req,res){
     sessions.verifyKey(req.params.apikey, function(result){
         if(result){
           userFunctions.getAllUsers(function(result){
-            if(errorCodes(result)){
-                res.json({result: errorCodes(result)});
-            }
-            else{res.json(result);}
+              errorCodes.responseCodeHandler(result, function(foundError, code){
+                  if(foundError){
+                      res.json(code);
+                  }
+                  else{res.json(result);}
+              });
           });
         }
         else{
          res.json({403: "Unauthenticated API request for friends list"});  
         }
-    })
+    });
     
 });
 
-app.get('/api/users/:username', function(req, res){
+app.get('/api/users/:username/api=:apikey', function(req, res){
      sessions.verifyKey(req.params.apikey, function(result){
-         if(result){
-           userFunctions.getUserByName(req.params.username, function(result){
-              if(errorCodes(result)){
-                res.json({result: errorCodes(result)});
-            }
-            else{res.json(result);}
-          });  
-         }
-         else{
-          res.json({403: "Unauthenticated API request"});   
-         }
-    
-    
-     });
+        if(result){
+          userFunctions.getUserByName(req.params.username, function(result){
+              errorCodes.responseCodeHandler(result, function(foundError, code){
+                  if(foundError){
+                      res.json(code);
+                  }
+                  else{
+                      res.json(result);
+                    }
+              });
+          });
+        }
+        else{
+         res.json({403: "Unauthenticated API request for friends list"});  
+        }
+    });
 });
 
-app.get('/api/users/:username', function(req, res){
-    userFunctions.getUserByName(res, req.params.username);
-});
 
 // =======================
 // GET REQUESTS =========

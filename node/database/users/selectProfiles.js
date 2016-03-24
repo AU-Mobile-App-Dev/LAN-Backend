@@ -13,7 +13,10 @@ exports.getUsers = function(callback) {
                 if (err) {
                    callback(500);
                 }
-                callback(rows);
+                else{
+                     callback(rows);
+                }
+               
                 connection.release();
             });
         }
@@ -34,7 +37,10 @@ exports.getUserByName= function(username, callback){
                 else if (results.length == 0) {
                     callback(204);
                 }
-                callback(results);
+                else{
+                    callback(results);
+                }
+                
                 connection.release();
             });
         }
