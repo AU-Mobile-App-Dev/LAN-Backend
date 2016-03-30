@@ -20,8 +20,9 @@ exports.authenticate = function(userObject, callback){
                     }
                    if(passwordFunctions.compareStrings(userObject.password, row[0].password)){
                        //Generate session id, insert it to the database and return the response
-                       var session = randomstring.generate();
-                       setSession.setSession(session, row[0].id);
+                       var session = userObject.username + randomstring.generate();
+                       session = passwordFunctions.hashString(session);
+                       setSession.setSession(session.toString(), row[0].id);
                        callback(true, session);
                       
                    }
