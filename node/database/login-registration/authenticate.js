@@ -19,9 +19,44 @@ exports.authenticate = function(userObject, callback){
                         console.log(err);
                     }
                    if(passwordFunctions.compareStrings(userObject.password, row[0].password)){
-                       //Generate session id, insert it to the database and return in response
-                       var session = randomstring.generate();
-                       setSession.setSession(session, row[0].id);
+                       //Generate session id, insert it to the database and return the response
+                       var session = userObject.username + randomstring.generate();
+                       session = passwordFunctions.hashString(session);
+                       setSession.setSession(session.toString(), row[0].id);
+                       callback(true, session);
+                      
+                   }
+                    else{
+                        
+                        callback(false, null);
+                    }   
+                    
+                    
+                    connection.release();
+                });
+        }
+        
+    });
+    
+   
+}
+
+exports.changeStatus = function(userObject, callback){
+    connectionpool.getConnection(function (err, connection) {
+        if (err) {
+            console.error('CONNECTION error: ', err);
+            if(err) return false;
+        } else {
+        
+                connection.query("UPDATE users SET status = !status username = ?", userObject.username, function (err, row) {
+                    if (err) {
+                        console.log(err);
+                    }
+                   if(passwordFunctions.compareStrings(userObject.password, row[0].password)){
+                       //Generate session id, insert it to the database and return the response
+                       var session = userObject.username + randomstring.generate();
+                       session = passwordFunctions.hashString(session);
+                       setSession.setSession(session.toString(), row[0].id);
                        callback(true, session);
                       
                    }

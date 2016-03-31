@@ -10,22 +10,25 @@ var exports = module.exports = {};
 
 
 
-exports.regUser = function(userObject, res){
+exports.regUser = function(userObject, callback){
     connectionpool.getConnection(function (err, connection) {
         if (err) {
-            console.error('CONNECTION error: ', err);
-            if(err) return res.status(500).send('Error connecting to database.');
+            
+            if(err){
+                callback(500);
+            }
         } else {
                 /**Hash the password before inserting it into the DB*/
+                console.log("inserting user into database");
                 userObject.password = passwordFunctions.hashString(userObject.password);
                 connection.query('INSERT INTO users SET ?', userObject, function (err, rows) {
                     if (err) {
                         console.log(err);
-                        return res.send({error: err.message});
+                       callback(503);
                     }
-                    res.send({
-                        result: 'success'
-                    });
+                   else{
+                       callback(201);
+                   }
                     connection.release();
                 });
         }

@@ -9,43 +9,87 @@ exports.getUsers = function(callback) {
             console.error('CONNECTION error: ', err);
             callback(500);
         } else {
-            connection.query('SELECT * FROM users', function (err, rows) {
+            connection.query('SELECT username, lat, lon, status FROM users', function (err, rows) {
                 if (err) {
                    callback(500);
                 }
-                callback(rows);
+                else{
+                     callback(rows);
+                }
+               
                 connection.release();
             });
         }
     });
 }
 
-exports.getUserByName= function(res, username){
+exports.getUserByName= function(username, callback){
     connectionpool.getConnection(function (err, connection) {
         if (err) {
             console.error('CONNECTION error: ', err);
-            res.statusCode = 503;
-            res.send({
-                result: 'error',
-                err: err.code
-            });
+            callback(503);
         } else {
-            connection.query("SELECT * FROM users WHERE username = ?", username, function (err, results) {
+            connection.query("SELECT username, lat, lon, status FROM users WHERE username = ?", username, function (err, results) {
                 if (err) {
                     console.error(err);
-                    res.statusCode = 500;
-                    res.send({
-                        result: "error",
-                        json:results
-                    });
-                }//If not results, user does not exist
+                   callback(500);
+                }//If no results, user does not exist
                 else if (results.length == 0) {
-                    return res.send({error: 'user does not exist'});
+                    callback(204);
                 }
-                res.send({
-                    result: 'success',
-                    json: results
-                });
+                else{
+                    callback(results);
+                }
+                
+                connection.release();
+            });
+        }
+    });
+}
+
+exports.getUserByLocation= function(coordinates, callback){
+    connectionpool.getConnection(function (err, connection) {
+        if (err) {
+            console.error('CONNECTION error: ', err);
+            callback(503);
+        } else {
+            connection.query("SELECT username, lat, lon, status FROM users WHERE lat = ? and lon = ?", 
+            [coordinates.lat, coordinates.lon], function (err, results) {
+                if (err) {
+                    console.error(err);
+                   callback(500);
+                }//If no results, user does not exist
+                else if (results.length === 0) {
+                    callback(204);
+                }
+                else{
+                    callback(results);
+                }
+                
+                connection.release();
+            });
+        }
+    });
+}
+
+exports.getFriendsList= function(username, callback){
+    connectionpool.getConnection(function (err, connection) {
+        if (err) {
+            console.error('CONNECTION error: ', err);
+            callback(503);
+        } else {
+            connection.query("SELECT username FROM users, friends_list WHERE users.id = friends_list.friend_id AND friends_list.user_id = (SELECT id from users where username = ?)", username, function (err, results) {
+                if (err) {
+                    console.error(err);
+                   callback(500);
+                }
+                else if(results.length === 0){
+                    callback(204);
+                }
+                else{
+                      callback(results);
+                }
+                
                 connection.release();
             });
         }

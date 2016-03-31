@@ -1,54 +1,138 @@
-var userFunctions = require('../database/users');
+var selectProfiles = require('../database/users');
 var sessions = require('../database/login-registration');
-    
-module.exports = function(app){
-// =======================
-// API REQUESTS ==========
-// =======================
-app.get('/api/users', function(req,res){
-    userFunctions.getAllUsers(function(result){
-        if(result == 500){
-            res.json({500:"Internal server error"});
-        }else{res.json(result);}
-    });
-});
-app.get('/api/users/:username', function(req, res){
-    userFunctions.getUserByName(res, req.params.username);
-});
+var errorCodes = require('./error-codes.js');
+var geocoder = require('geocoder');
 
-// =======================
-// GET REQUESTS =========
-// =======================
-app.get('/users/:username/friends/:session', function(req,res){
-    sessions.getSession(req.params.username, req.params.session, function(result){
-        if(result){
-            res.json({200: "Authorized request for friends list!"});
-        }
-        else{
-            res.json({403: "Unauthenticated request for friends list"});
-        }
-    });
-    
-});
-// =======================
-// POST REQUESTS =========
-// =======================
-app.get('/users/:username/friends/token=:token', function(req,res){
-    if ( TokenGenerator.isValid( token ) ) {
-     userFunctions.getFriends(function(result){
-        if(result == 500){
-            res.json({500:"Internal server error"});
-        }else{res.json(result);}
-    });
-} else {
-    res.json({403: "Unauthenticated request"}); 
-}
-    
-});
+module.exports = function(app) {
+    // ===============================
+    // API REQUESTS for Users resource 
+    // ===============================
 
-// =======================
-// DELETE REQUESTS =======
-// =======================
+    app.get('/api/users/api=:apikey', function(req, res) {
+        sessions.verifyKey(req.params.apikey, function(result) {
+            if (result) {
+                selectProfiles.getAllUsers(function(result) {
+                    errorCodes.responseCodeHandler(result, function(foundError, code) {
+                        if (foundError) {
+                            res.json(code);
+                        } else {
+                            res.json(result);
+                        }
+                    });
+                });
+            } else {
+                res.json({
+                    403: "Unauthenticated API request for friends list"
+                });
+            }
+        });
+
+    });
+
+    app.get('/api/users/:username/api=:apikey', function(req, res) {
+        sessions.verifyKey(req.params.apikey, function(result) {
+            if (result) {
+                selectProfiles.getUserByName(req.params.username, function(result) {
+                    errorCodes.responseCodeHandler(result, function(foundError, code) {
+                        if (foundError) {
+                            res.json(code);
+                        } else {
+                            res.json(result);
+                        }
+                    });
+                });
+            } else {
+                res.json({
+                    403: "Unauthenticated API request for friends list"
+                });
+            }
+        });
+    });
+   
+    app.get('/api/users/:location/api=:apikey', function(req, res) {
+        sessions.verifyKey(req.params.apikey, function(result) {
+            if (result) {
+                geocoder.geocode(req.params.location, function(err, data) {
+                    if (err) {
+                        res.json({
+                            400: "Geocoder could not get the location, please check for syntax errors."
+                        });
+                    } else {
+                        var coordinates = {
+                            lat: data.results[0].geometry.location.lat,
+                            lon: data.results[0].geometry.location.lng
+                        };
+                        selectProfiles.getUserByLocation(coordinates, function(result) {
+                            errorCodes.responseCodeHandler(result, function(foundError, code) {
+                                if (foundError) {
+                                    res.json(code);
+                                } else {
+                                    res.json(result);
+                                }
+                            })
+                        });
+                    }
+                });
+            } else {
+                res.json({
+                    403: "Unauthenticated API request for friends list"
+                });
+            }
+        });
+    });
+
+    app.get('/api/users/friends/api=:apikey', function(req, res) {
+        sessions.verifyKey(req.params.apikey, function(result) {
+            if (result) {
+                selectProfiles.getFriends(req.params.username, function(result) {
+                    errorCodes.responseCodeHandler(result, function(foundError, code) {
+                        if (foundError) {
+                            res.json(code);
+                        } else {
+                            res.json(result);
+                        }
+                    });
+                });
+            } else {
+                res.json({
+                    403: "Unauthenticated API request for friends list"
+                });
+            }
+        });
+    });
+
+
+    // =======================
+    // GET REQUESTS =========
+    // =======================
+
+    // =======================
+    // POST REQUESTS =========
+    // =======================
+    app.post('/users/friends', function(req, res) {
+        sessions.getSession(req.body.username, req.body.session, function(result) {
+            if (result) {
+                selectProfiles.getFriends(req.body.username, function(result) {
+                    errorCodes.responseCodeHandler(result, function(foundError, code) {
+                        if (foundError) {
+                            res.json(code);
+                        } else {
+                            res.json(result);
+                        }
+                    })
+                });
+            } else {
+                res.json({
+                    403: "Unauthenticated request for friends list"
+                });
+            }
+        });
+
+    });
+
+    // =======================
+    // DELETE REQUESTS =======
+    // =======================
 
 
 
