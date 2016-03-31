@@ -1,30 +1,15 @@
 angular.module('lanSocial', [])
 
-.controller('regController', function($http, $scope, regUser, validate){
+.controller('regController', function($http, $scope){
     $scope.regUser = function(){
-        var userObject = {
-            username: $scope.username,
-            password: $scope.password,
-        }
-        validate.validateEmail($scope.email, function(result){
-            if(result){
-                  regUser.register(userObject);
-            }
-            else{
-               //Tell user it's not valid
-               $scope.feedback = "not valid";
-            }
-        })
-       
-    }
-})
-
-
-
-.service('validate', function(){
-    this.validateEmail = function(email, callback){
-        //check if it's a valid email
-        //it's invalid, return false
-        callback(false);
+        $http({
+  method: 'POST',
+  url: 'http://localhost:5000/register',
+  data:{username: $scope.username, password:$scope.password, email:$scope.email, location:$scope.location}
+}).then(function successCallback(response) {
+    console.log(response.data);
+  }, function errorCallback(response) {
+     console.log(response.data);
+  });
     }
 })

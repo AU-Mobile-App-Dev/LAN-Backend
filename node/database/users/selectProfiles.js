@@ -9,7 +9,7 @@ exports.getUsers = function(callback) {
             console.error('CONNECTION error: ', err);
             callback(500);
         } else {
-            connection.query('SELECT * FROM users', function (err, rows) {
+            connection.query('SELECT username, lat, lon, status FROM users', function (err, rows) {
                 if (err) {
                    callback(500);
                 }
@@ -29,7 +29,7 @@ exports.getUserByName= function(username, callback){
             console.error('CONNECTION error: ', err);
             callback(503);
         } else {
-            connection.query("SELECT * FROM users WHERE username = ?", username, function (err, results) {
+            connection.query("SELECT username, lat, lon, status FROM users WHERE username = ?", username, function (err, results) {
                 if (err) {
                     console.error(err);
                    callback(500);
@@ -53,13 +53,13 @@ exports.getUserByLocation= function(coordinates, callback){
             console.error('CONNECTION error: ', err);
             callback(503);
         } else {
-            connection.query("SELECT * FROM users WHERE lat = ? and lon = ?", 
+            connection.query("SELECT username, lat, lon, status FROM users WHERE lat = ? and lon = ?", 
             [coordinates.lat, coordinates.lon], function (err, results) {
                 if (err) {
                     console.error(err);
                    callback(500);
                 }//If no results, user does not exist
-                else if (results.length == 0) {
+                else if (results.length === 0) {
                     callback(204);
                 }
                 else{
@@ -82,6 +82,9 @@ exports.getFriendsList= function(username, callback){
                 if (err) {
                     console.error(err);
                    callback(500);
+                }
+                else if(results.length === 0){
+                    callback(204);
                 }
                 else{
                       callback(results);

@@ -45,7 +45,7 @@ app.post('/register', function(req, res) {
                       res.json(code);
                   }
                   else{
-                      res.json(result);
+                      res.json(code);
                     }
               });
         });
