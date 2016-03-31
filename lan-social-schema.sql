@@ -1,8 +1,8 @@
--- MySQL dump 10.13  Distrib 5.6.24, for Win32 (x86)
+-- MySQL dump 10.13  Distrib 5.7.9, for Win64 (x86_64)
 --
--- Host: 127.0.0.1    Database: lan-social
+-- Host: localhost    Database: lan-social
 -- ------------------------------------------------------
--- Server version	5.6.21
+-- Server version	5.6.25
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
 /*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
@@ -31,8 +31,17 @@ CREATE TABLE `friends_list` (
   KEY `fk_friend_id_idx` (`friend_id`),
   CONSTRAINT `fk_friend_id` FOREIGN KEY (`friend_id`) REFERENCES `users` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   CONSTRAINT `fk_user` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION
-) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `friends_list`
+--
+
+LOCK TABLES `friends_list` WRITE;
+/*!40000 ALTER TABLE `friends_list` DISABLE KEYS */;
+/*!40000 ALTER TABLE `friends_list` ENABLE KEYS */;
+UNLOCK TABLES;
 
 --
 -- Table structure for table `genre_list`
@@ -47,6 +56,15 @@ CREATE TABLE `genre_list` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `genre_list`
+--
+
+LOCK TABLES `genre_list` WRITE;
+/*!40000 ALTER TABLE `genre_list` DISABLE KEYS */;
+/*!40000 ALTER TABLE `genre_list` ENABLE KEYS */;
+UNLOCK TABLES;
 
 --
 -- Table structure for table `messages`
@@ -70,6 +88,15 @@ CREATE TABLE `messages` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
+-- Dumping data for table `messages`
+--
+
+LOCK TABLES `messages` WRITE;
+/*!40000 ALTER TABLE `messages` DISABLE KEYS */;
+/*!40000 ALTER TABLE `messages` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
 -- Table structure for table `newsfeed_status`
 --
 
@@ -88,6 +115,15 @@ CREATE TABLE `newsfeed_status` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
+-- Dumping data for table `newsfeed_status`
+--
+
+LOCK TABLES `newsfeed_status` WRITE;
+/*!40000 ALTER TABLE `newsfeed_status` DISABLE KEYS */;
+/*!40000 ALTER TABLE `newsfeed_status` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
 -- Table structure for table `owned_games`
 --
 
@@ -104,6 +140,15 @@ CREATE TABLE `owned_games` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
+-- Dumping data for table `owned_games`
+--
+
+LOCK TABLES `owned_games` WRITE;
+/*!40000 ALTER TABLE `owned_games` DISABLE KEYS */;
+/*!40000 ALTER TABLE `owned_games` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
 -- Table structure for table `status`
 --
 
@@ -116,6 +161,16 @@ CREATE TABLE `status` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `status`
+--
+
+LOCK TABLES `status` WRITE;
+/*!40000 ALTER TABLE `status` DISABLE KEYS */;
+INSERT INTO `status` VALUES (0,'offline'),(1,'online');
+/*!40000 ALTER TABLE `status` ENABLE KEYS */;
+UNLOCK TABLES;
 
 --
 -- Table structure for table `user_profile`
@@ -142,6 +197,15 @@ CREATE TABLE `user_profile` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
+-- Dumping data for table `user_profile`
+--
+
+LOCK TABLES `user_profile` WRITE;
+/*!40000 ALTER TABLE `user_profile` DISABLE KEYS */;
+/*!40000 ALTER TABLE `user_profile` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
 -- Table structure for table `users`
 --
 
@@ -156,7 +220,7 @@ CREATE TABLE `users` (
   `lat` varchar(45) NOT NULL,
   `lon` varchar(45) NOT NULL,
   `dob` date DEFAULT NULL,
-  `status` int(11) NOT NULL,
+  `status` int(11) NOT NULL DEFAULT '0',
   `session` varchar(32) NOT NULL,
   `api_key` varchar(64) NOT NULL,
   PRIMARY KEY (`id`),
@@ -164,8 +228,18 @@ CREATE TABLE `users` (
   UNIQUE KEY `email_UNIQUE` (`email`),
   KEY `fk_status_idx` (`status`),
   CONSTRAINT `fk_status` FOREIGN KEY (`status`) REFERENCES `status` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION
-) ENGINE=InnoDB AUTO_INCREMENT=468 DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `users`
+--
+
+LOCK TABLES `users` WRITE;
+/*!40000 ALTER TABLE `users` DISABLE KEYS */;
+INSERT INTO `users` VALUES (2,'android','4e012553b35b21f960944c5dab43687ff50e3fa9','android','41.8500284','-88.3125738',NULL,0,'','9f86d081884c7d659a2feaa0c55ad015a3bf4f1b2b0b822cd15d6c15b0f00a08'),(3,'rob','2c08e8f5884750a7b99f6f2f342fc638db25ff31','rob@email.com','41.8500284','-88.3125738',NULL,0,'',''),(4,'test','5e52fee47e6b070565f74372468cdc699de89107','test@test.com','41.9141945','-88.3086867',NULL,0,'','');
+/*!40000 ALTER TABLE `users` ENABLE KEYS */;
+UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 
 /*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
@@ -176,4 +250,4 @@ CREATE TABLE `users` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2016-03-31 11:19:34
+-- Dump completed on 2016-03-31 14:11:27
