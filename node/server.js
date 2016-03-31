@@ -14,6 +14,7 @@ var port = process.env.PORT || 5000;
 
 /*app configs*/
 app.use(express.static(__dirname + '/views'));
+app.use(express.static(__dirname +'/scripts'));
 app.use(express.static(__dirname +'/public'));
 app.use(express.static(__dirname +'/lib'));
 app.enable('trust proxy');

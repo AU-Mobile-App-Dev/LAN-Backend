@@ -33,7 +33,32 @@ exports.getUserByName= function(username, callback){
                 if (err) {
                     console.error(err);
                    callback(500);
-                }//If not results, user does not exist
+                }//If no results, user does not exist
+                else if (results.length == 0) {
+                    callback(204);
+                }
+                else{
+                    callback(results);
+                }
+                
+                connection.release();
+            });
+        }
+    });
+}
+
+exports.getUserByLocation= function(coordinates, callback){
+    connectionpool.getConnection(function (err, connection) {
+        if (err) {
+            console.error('CONNECTION error: ', err);
+            callback(503);
+        } else {
+            connection.query("SELECT * FROM users WHERE lat = ? and lon = ?", 
+            [coordinates.lat, coordinates.lon], function (err, results) {
+                if (err) {
+                    console.error(err);
+                   callback(500);
+                }//If no results, user does not exist
                 else if (results.length == 0) {
                     callback(204);
                 }
@@ -53,8 +78,7 @@ exports.getFriendsList= function(username, callback){
             console.error('CONNECTION error: ', err);
             callback(503);
         } else {
-            connection.query("SELECT username FROM users, friends_list WHERE users.id = friends_list.friend_id" +
-            "AND friends_list.user_id = (SELECT id from users where username = ?)", username, function (err, results) {
+            connection.query("SELECT username FROM users, friends_list WHERE users.id = friends_list.friend_id AND friends_list.user_id = (SELECT id from users where username = ?)", username, function (err, results) {
                 if (err) {
                     console.error(err);
                    callback(500);

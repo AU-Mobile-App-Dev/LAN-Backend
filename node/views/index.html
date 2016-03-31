@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" ng-app="pitectionApp">
+<html lang="en" ng-app="lanSocial">
 
 <head>
     <meta charset="UTF-8">
@@ -10,30 +10,22 @@
 
 </head>
 
-<div class="modal-wrapper">
-    <div id="popup">
-        <div class="modal-header"><h2>Welcome</h2><hr/></div>
-        <form class="form" novalidate>
+
+    <div ng-controller="regController">
+    
             <input type="text" placeholder="Username" ng-model='username' required/>
             <input type="password" placeholder="Password" ng-model='password' required />
-            <button class="form-button" ng-click="userLogin()">Login</button><a class="form-button" href="/logout">Logout</a>
-        </form>
-        <span id="invalidLogin" ng-hide="invalidLogin">Invalid Credentials</span>
-
-
-        <div class="modal-footer"><hr/><a class='mobile-link' href="#">Stay protected on the go</a></div>
-    </div>
+            <input type="text" placeholder="email@email.com" ng-model='email' required />
+            <input type="text" placeholder="New York, NY" ng-model='location' required />
+            <button class="form-button" ng-click="regUser()">Login</button><a class="form-button" href="/logout">Logout</a>
+       
 </div>
-<body ng-view>
+<body>
 
 
 
-<script src="/scripts/navbar-js.js"></script>
-<script src='/angular/angular.min.js'></script>
-<script src='/angular/angular-resource.min.js'></script>
-<script src='/angular/route.js'></script>
+ <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.4.5/angular.min.js"></script>
 <script src='/scripts/app.js'></script>
-<script src='/scripts/services/login-services.js'></script>
 </body>
 
 

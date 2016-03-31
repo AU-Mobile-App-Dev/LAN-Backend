@@ -8,22 +8,27 @@ var connection = require('../connection-header.js').getConnection();
 var loginRegFunctions = require('./user-registration.js');
 var exp = module.exports = {};
 
-exp.isDuplicate = function(userObject, res){
+exp.isDuplicate = function(userObject, callback){
     console.log("Checking for duplicate username");
     connectionpool.getConnection(function (err, connection) {
         if(err){
             console.error('CONNECTION error: ', err);
-            return res.statusCode = 503;
+            callback(503);
         }
-        connection.query('SELECT username FROM users WHERE username = ?', connection.escape(userObject.username), function (err, results) {
-            if (err) return res.status(500).send('Error connecting to database.');
+        connection.query('SELECT username FROM users WHERE username = ?',userObject.username, function (err, results) {
+            if (err){
+                callback(503);
+            } 
 
             if (results.length !== 0) {
-                return res.send({error: 'Username exists'});
+               callback({"Error": "Duplicate username"});
+            }
+            else{
+                //Start checking for duplicate emails, if username is not taken
+            checkEmail(userObject, callback);
             }
 
-          //Start checking for duplicate emails, if username is not taken
-            checkEmail(userObject, res);
+          
         });
         connection.release();
        
@@ -31,20 +36,21 @@ exp.isDuplicate = function(userObject, res){
     });
 }
 
-checkEmail = function(userObject, res){
+checkEmail = function(userObject, callback){
     console.log("Checking for duplicate email");
     connectionpool.getConnection(function (err, connection) {
         if(err){
-            console.error('CONNECTION error: ', err);
-            return res.statusCode = 503;
+           callback(503); 
         }
-        connection.query('SELECT username FROM users WHERE email = ?', connection.escape(userObject.email), function (err, results) {
-            if (err) return res.status(500).send('Error connecting to database.');
+        connection.query('SELECT username FROM users WHERE email = ?', userObject.email, function (err, results) {
+            if (err) {
+                callback(500);
+            }
 
             if (results.length !== 0) {
-                return res.send({error: 'Email already registered'});
+                callback({"Error":"Email already registered"});
             }else{
-               loginRegFunctions.regUser(userObject, res);
+               loginRegFunctions.regUser(userObject, callback);
             }
 
         });

@@ -34,7 +34,7 @@ exports.getSession = function(username, session, callback){
             if(err) return false;
         } else {
         
-                connection.query("SELECT session from users WHERE username =?",username, function (err, row) {
+                connection.query("SELECT session from users WHERE username =?", username, function (err, row) {
                     if (err) {
                         console.log(err);
                     }

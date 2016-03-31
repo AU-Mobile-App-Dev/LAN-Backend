@@ -1,7 +1,7 @@
 var loginRegFunctions = require('../database/login-registration');
+var geocoder = require('geocoder');
+var errorCodes = require('./error-codes.js');
 
-
- 
 module.exports = function(app){
 // =======================
 // POST REQUESTS =========
@@ -22,17 +22,34 @@ app.post('/authenticate', function(req, res){
     });
 });
 app.post('/register', function(req, res) {
+    //Get the lat and lon for the username
+    geocoder.geocode(req.body.location, function ( err, data ) {
+        if(err){
+            res.json({400:"The request could not be understood by the server due to malformed syntax."});
+        }
         /**Create object out  of passed params*/
         var userObject = {
             username: req.body.username,
             password: req.body.password,
+            lat: data.results[0].geometry.location.lat,
+            lon: data.results[0].geometry.location.lng,
             email: req.body.email
         };
         // ==========================
         // Check for duplicate emails
         // and usernames ===========
         // =========================
-        loginRegFunctions.checkDups(userObject, res);
+        loginRegFunctions.checkDups(userObject, function(result){
+            errorCodes.responseCodeHandler(result, function(foundError, code){
+                  if(foundError){
+                      res.json(code);
+                  }
+                  else{
+                      res.json(result);
+                    }
+              });
+        });
+      });
 });
 
 app.post('/users/getKey', function(req, res){

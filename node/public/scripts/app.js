@@ -1,49 +1,30 @@
-angular.module('pitectionApp', ['ngRoute', 'ngResource'])
+angular.module('lanSocial', [])
 
-
-//Controllers
-.controller('mainController',function($scope,sessionService){
-   $scope.username =  sessionService.getUser();
-})
-
-
-.controller('loginController', function($scope,login){
-    /**Add the username and password attributes to the scope object*/
-    $scope.username = '';
-    $scope.password = '';
-    //ng-hide on span tag
-    $scope.invalidLogin = true;
-    /**ng-click directive function called, uses login service function*/
-    $scope.userLogin = function(){
-        login.verify($scope)
-
+.controller('regController', function($http, $scope, regUser, validate){
+    $scope.regUser = function(){
+        var userObject = {
+            username: $scope.username,
+            password: $scope.password,
+        }
+        validate.validateEmail($scope.email, function(result){
+            if(result){
+                  regUser.register(userObject);
+            }
+            else{
+               //Tell user it's not valid
+               $scope.feedback = "not valid";
+            }
+        })
+       
     }
 })
-    .controller('registerController', function($scope, registerService){
-        $scope.regUser = function(){
-            var userObject = {username: $scope.username,
-            password: $scope.password,
-            email: $scope.email};
-            registerService.registerUser(userObject);
-        }
 
-    })
 
-.config(function($routeProvider){
-    $routeProvider
-        .when('/', {
-            templateUrl: 'index.html',
-            controller: 'loginController'
-        })
 
-        .when('/login', {
-            templateUrl: 'main.html',
-            controller: 'mainController'
-        })
-        .when('/register', {
-            templateUrl: 'register.html',
-            controller: 'registerController'
-        }
-        );
-});
-
+.service('validate', function(){
+    this.validateEmail = function(email, callback){
+        //check if it's a valid email
+        //it's invalid, return false
+        callback(false);
+    }
+})
