@@ -1,20 +1,19 @@
-/**
- * Created by Rob on 2/18/2016.
- */
 var connectionpool = require('../connection-header.js').getConnection();
 var exports = module.exports = {};
-exports.getUsers = function(callback) {
+
+exports.addFriend = function(username, friendName, callback) {
     connectionpool.getConnection(function (err, connection) {
         if (err) {
             console.error('CONNECTION error: ', err);
             callback(500);
         } else {
-            connection.query('SELECT username, lat, lon, status FROM users', function (err, rows) {
+            connection.query('INSERT INTO friends_list (user_id, friend_id) VALUES ((SELECT id FROM users WHERE username=?), (SELECT id FROM users WHERE username=?))',
+            [username, friendName], function (err, rows) {
                 if (err) {
                    callback(500);
                 }
                 else{
-                     callback(rows);
+                     callback(201);
                 }
                
                 connection.release();
@@ -23,22 +22,43 @@ exports.getUsers = function(callback) {
     });
 }
 
-exports.getUserByName= function(username, callback){
+exports.deleteFriend = function(username, friendName, callback) {
+    connectionpool.getConnection(function (err, connection) {
+        if (err) {
+            console.error('CONNECTION error: ', err);
+            callback(500);
+        } else {
+            connection.query('DELETE FROM friends_list WHERE user_id=(SELECT id FROM users WHERE username=?) AND friend_id=(SELECT id FROM users WHERE username=?)',
+            [username, friendName], function (err, rows) {
+                if (err) {
+                   callback(500);
+                }
+                else{
+                     callback(201);
+                }
+               
+                connection.release();
+            });
+        }
+    });
+}
+
+exports.getFriendsList= function(username, callback){
     connectionpool.getConnection(function (err, connection) {
         if (err) {
             console.error('CONNECTION error: ', err);
             callback(503);
         } else {
-            connection.query("SELECT username, lat, lon, status FROM users WHERE username = ?", username, function (err, results) {
+            connection.query("SELECT username FROM users, friends_list WHERE users.id = friends_list.friend_id AND friends_list.user_id = (SELECT id from users where username = ?)", username, function (err, results) {
                 if (err) {
                     console.error(err);
                    callback(500);
-                }//If no results, user does not exist
-                else if (results.length == 0) {
+                }
+                else if(results.length === 0){
                     callback(204);
                 }
                 else{
-                    callback(results);
+                      callback(results);
                 }
                 
                 connection.release();
@@ -46,29 +66,3 @@ exports.getUserByName= function(username, callback){
         }
     });
 }
-
-exports.getUserByLocation= function(coordinates, callback){
-    connectionpool.getConnection(function (err, connection) {
-        if (err) {
-            console.error('CONNECTION error: ', err);
-            callback(503);
-        } else {
-            connection.query("SELECT username, lat, lon, status FROM users WHERE lat = ? and lon = ?", 
-            [coordinates.lat, coordinates.lon], function (err, results) {
-                if (err) {
-                    console.error(err);
-                   callback(500);
-                }//If no results, user does not exist
-                else if (results.length === 0) {
-                    callback(204);
-                }
-                else{
-                    callback(results);
-                }
-                
-                connection.release();
-            });
-        }
-    });
-}
-
