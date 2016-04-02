@@ -1,8 +1,8 @@
--- MySQL dump 10.13  Distrib 5.7.9, for Win64 (x86_64)
+-- MySQL dump 10.13  Distrib 5.6.24, for Win32 (x86)
 --
--- Host: localhost    Database: lan-social
+-- Host: 127.0.0.1    Database: lan-social
 -- ------------------------------------------------------
--- Server version	5.6.25
+-- Server version	5.6.21
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
 /*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
@@ -67,6 +67,30 @@ LOCK TABLES `genre_list` WRITE;
 UNLOCK TABLES;
 
 --
+-- Table structure for table `message_type`
+--
+
+DROP TABLE IF EXISTS `message_type`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `message_type` (
+  `id` int(11) NOT NULL,
+  `type` varchar(45) DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `message_type`
+--
+
+LOCK TABLES `message_type` WRITE;
+/*!40000 ALTER TABLE `message_type` DISABLE KEYS */;
+INSERT INTO `message_type` VALUES (0,'friend request'),(1,'message');
+/*!40000 ALTER TABLE `message_type` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
 -- Table structure for table `messages`
 --
 
@@ -77,14 +101,18 @@ CREATE TABLE `messages` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `sender` int(11) NOT NULL,
   `receiver` int(11) NOT NULL,
-  `message` varchar(150) NOT NULL,
-  `sent` datetime NOT NULL,
+  `message` blob NOT NULL,
+  `sent` date NOT NULL,
+  `read` int(1) DEFAULT '0',
+  `type` int(11) DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `fk_sender_idx` (`sender`),
   KEY `fk_receiver_idx` (`receiver`),
+  KEY `fk_message_type_idx` (`type`),
+  CONSTRAINT `fk_message_type` FOREIGN KEY (`type`) REFERENCES `message_type` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   CONSTRAINT `fk_receiver` FOREIGN KEY (`receiver`) REFERENCES `users` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   CONSTRAINT `fk_sender` FOREIGN KEY (`sender`) REFERENCES `users` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -93,6 +121,7 @@ CREATE TABLE `messages` (
 
 LOCK TABLES `messages` WRITE;
 /*!40000 ALTER TABLE `messages` DISABLE KEYS */;
+INSERT INTO `messages` VALUES (1,3,2,'Let\'s meet up sometime','0000-00-00',0,0);
 /*!40000 ALTER TABLE `messages` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -250,4 +279,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2016-03-31 14:11:27
+-- Dump completed on 2016-04-02 18:19:32
