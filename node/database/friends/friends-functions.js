@@ -66,3 +66,29 @@ exports.getFriendsList= function(username, callback){
         }
     });
 }
+
+exports.sendRequest= function(username, friendName, message, callback){
+    connectionpool.getConnection(function (err, connection) {
+        if (err) {
+            console.error('CONNECTION error: ', err);
+            callback(503);
+        } else {
+            connection.query("INSERT INTO `messages` (sender, receiver, message, sent, type) VALUES"+
+ "((SELECT id from users WHERE username=?),(SELECT id FROM users WHERE username=?), ?, ?, 0)", 
+ [username, friendName, message, (new Date()).toISOString().substring(0, 10)], function (err, results) {
+                if (err) {
+                    console.error(err);
+                   callback(500);
+                }
+                else if(results.length === 0){
+                    callback(204);
+                }
+                else{
+                      callback(results);
+                }
+                
+                connection.release();
+            });
+        }
+    });
+}

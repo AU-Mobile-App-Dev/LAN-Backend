@@ -41,7 +41,7 @@ module.exports = function(app) {
                 });
             } else {
                 res.json({
-                    403: "Unauthenticated API request for friends list"
+                    403: "Unauthenticated API request"
                 });
             }
         });
@@ -76,6 +76,8 @@ module.exports = function(app) {
 
     });
     
+  
+    
     // =======================
     // PUT REQUESTS ==========
     // =======================
@@ -93,12 +95,29 @@ module.exports = function(app) {
                 });
             } else {
                 res.json({
-                    403: "Unauthenticated request for friends list"
+                    403: "Unauthenticated request"
                 });
             }
         });
 
     });
+    
+     app.put('/friends/sendRequest', function(req, res){
+      sessions.getSession(req.body.username, req.body.session, function(result){
+          if(result){
+              friendFunctions.sendRequest(req.body.username, req.body.friendName, req.body.message, function(result){
+                  errorCodes.require(result, function(foundError, code){
+                      if(foundError){
+                          res.json(code);
+                      }
+                      else{
+                          res.json(result);
+                      }
+                  });
+              });
+          }
+      }); 
+   });
         
     // =======================
     // DELETE REQUESTS =======
@@ -117,7 +136,7 @@ module.exports = function(app) {
                 });
             } else {
                 res.json({
-                    403: "Unauthenticated request for friends list"
+                    403: "Unauthenticated request"
                 });
             }
         });
