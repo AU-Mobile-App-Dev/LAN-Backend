@@ -1,8 +1,8 @@
--- MySQL dump 10.13  Distrib 5.7.9, for Win64 (x86_64)
+-- MySQL dump 10.13  Distrib 5.6.24, for Win32 (x86)
 --
--- Host: localhost    Database: lan-social
+-- Host: 127.0.0.1    Database: lan-social
 -- ------------------------------------------------------
--- Server version	5.6.25
+-- Server version	5.6.21
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
 /*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
@@ -97,30 +97,31 @@ LOCK TABLES `messages` WRITE;
 UNLOCK TABLES;
 
 --
--- Table structure for table `newsfeed_status`
+-- Table structure for table `newsfeed`
 --
 
-DROP TABLE IF EXISTS `newsfeed_status`;
+DROP TABLE IF EXISTS `newsfeed`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `newsfeed_status` (
+CREATE TABLE `newsfeed` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
-  `user` int(11) NOT NULL,
+  `user_id` int(11) NOT NULL,
   `timestamp` datetime NOT NULL,
   `message` varchar(100) NOT NULL,
+  `likes` int(11) DEFAULT '0',
   PRIMARY KEY (`id`),
-  KEY `fk_userID_idx` (`user`),
-  CONSTRAINT `fk_userID` FOREIGN KEY (`user`) REFERENCES `users` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION
+  KEY `fk_userID_idx` (`user_id`),
+  CONSTRAINT `fk_userID` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `newsfeed_status`
+-- Dumping data for table `newsfeed`
 --
 
-LOCK TABLES `newsfeed_status` WRITE;
-/*!40000 ALTER TABLE `newsfeed_status` DISABLE KEYS */;
-/*!40000 ALTER TABLE `newsfeed_status` ENABLE KEYS */;
+LOCK TABLES `newsfeed` WRITE;
+/*!40000 ALTER TABLE `newsfeed` DISABLE KEYS */;
+/*!40000 ALTER TABLE `newsfeed` ENABLE KEYS */;
 UNLOCK TABLES;
 
 --
@@ -250,4 +251,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2016-03-31 14:11:27
+-- Dump completed on 2016-04-04 11:46:35
