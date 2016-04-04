@@ -72,26 +72,3 @@ exports.getUserByLocation= function(coordinates, callback){
     });
 }
 
-exports.getFriendsList= function(username, callback){
-    connectionpool.getConnection(function (err, connection) {
-        if (err) {
-            console.error('CONNECTION error: ', err);
-            callback(503);
-        } else {
-            connection.query("SELECT username FROM users, friends_list WHERE users.id = friends_list.friend_id AND friends_list.user_id = (SELECT id from users where username = ?)", username, function (err, results) {
-                if (err) {
-                    console.error(err);
-                   callback(500);
-                }
-                else if(results.length === 0){
-                    callback(204);
-                }
-                else{
-                      callback(results);
-                }
-                
-                connection.release();
-            });
-        }
-    });
-}

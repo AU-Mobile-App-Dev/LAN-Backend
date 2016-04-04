@@ -1,4 +1,4 @@
-var selectProfiles = require('../database/users');
+var profiles = require('../database/users');
 var sessions = require('../database/login-registration');
 var errorCodes = require('./error-codes.js');
 var geocoder = require('geocoder');
@@ -11,7 +11,7 @@ module.exports = function(app) {
     app.get('/api/users/api=:apikey', function(req, res) {
         sessions.verifyKey(req.params.apikey, function(result) {
             if (result) {
-                selectProfiles.getAllUsers(function(result) {
+                profiles.getAllUsers(function(result) {
                     errorCodes.responseCodeHandler(result, function(foundError, code) {
                         if (foundError) {
                             res.json(code);
@@ -32,7 +32,7 @@ module.exports = function(app) {
     app.get('/api/users/:username/api=:apikey', function(req, res) {
         sessions.verifyKey(req.params.apikey, function(result) {
             if (result) {
-                selectProfiles.getUserByName(req.params.username, function(result) {
+                profiles.getUserByName(req.params.username, function(result) {
                     errorCodes.responseCodeHandler(result, function(foundError, code) {
                         if (foundError) {
                             res.json(code);
@@ -62,7 +62,7 @@ module.exports = function(app) {
                             lat: data.results[0].geometry.location.lat,
                             lon: data.results[0].geometry.location.lng
                         };
-                        selectProfiles.getUserByLocation(coordinates, function(result) {
+                        profiles.getUserByLocation(coordinates, function(result) {
                             errorCodes.responseCodeHandler(result, function(foundError, code) {
                                 if (foundError) {
                                     res.json(code);
@@ -81,26 +81,7 @@ module.exports = function(app) {
         });
     });
 
-    app.get('/api/users/friends/api=:apikey', function(req, res) {
-        sessions.verifyKey(req.params.apikey, function(result) {
-            if (result) {
-                selectProfiles.getFriends(req.params.username, function(result) {
-                    errorCodes.responseCodeHandler(result, function(foundError, code) {
-                        if (foundError) {
-                            res.json(code);
-                        } else {
-                            res.json(result);
-                        }
-                    });
-                });
-            } else {
-                res.json({
-                    403: "Unauthenticated API request for friends list"
-                });
-            }
-        });
-    });
-
+    
 
     // =======================
     // GET REQUESTS =========
@@ -109,31 +90,16 @@ module.exports = function(app) {
     // =======================
     // POST REQUESTS =========
     // =======================
-    app.post('/users/friends', function(req, res) {
-        sessions.getSession(req.body.username, req.body.session, function(result) {
-            if (result) {
-                selectProfiles.getFriends(req.body.username, function(result) {
-                    errorCodes.responseCodeHandler(result, function(foundError, code) {
-                        if (foundError) {
-                            res.json(code);
-                        } else {
-                            res.json(result);
-                        }
-                    })
-                });
-            } else {
-                res.json({
-                    403: "Unauthenticated request for friends list"
-                });
-            }
-        });
-
-    });
-
+    
+    // =======================
+    // PUT REQUESTS ==========
+    // =======================
+   
+        
     // =======================
     // DELETE REQUESTS =======
     // =======================
-
+    
 
 
 }
