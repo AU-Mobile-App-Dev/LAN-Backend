@@ -7,7 +7,7 @@ exports.responseCodeHandler = function(code, callback){
         callback(false, {200: "Success"});
         break;
     case 201:
-        callback(false, {201: "The request has been fulfilled and resource has been updated."});
+        callback(true, {201: "The request has been fulfilled and resource has been updated."});
         break;
     case 204:
         callback(true, {204: "Your request successfully processed but no content could be found."});
@@ -21,6 +21,9 @@ exports.responseCodeHandler = function(code, callback){
     case 403:
         callback(true, {403: "The server understood the request, but level of access is denied."});
         break;
+   case 404:
+         callback(true, {404: "Resource you're looking for does not exist"});
+         break;
     case 500:
         callback(true, {500: "Internal server error."});
         break;

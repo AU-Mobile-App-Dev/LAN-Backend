@@ -12,9 +12,8 @@ app.post('/authenticate', function(req, res){
         password: req.body.password
     }
     loginRegFunctions.authenticate(userObject, function(result, session){
-        console.log(result);
         if(result){
-            res.json({ success: true, message: 'User is authorized', sessionkey: session});           
+            res.json({ success: true, message: 'User is authorized', session: session});           
         }
         else{
             res.json({ success: false, message: 'Authentication failed.' });
