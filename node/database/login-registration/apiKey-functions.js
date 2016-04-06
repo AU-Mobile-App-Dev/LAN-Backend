@@ -42,15 +42,15 @@ exports.generateKey = function(userObject, callback){
 exports.verifyKey = function(key, callback){
     connectionpool.getConnection(function (err, connection) {
         if (err) {
-            console.error('CONNECTION error: ', err);
-            if(err) return false;
+            callback(false);
         } else {
-        
+            key = passwordFunctions.hashString(key).toString();
                 connection.query("SELECT * FROM users WHERE api_key = ?", key, function (err, row) {
                     if (err) {
                         console.log(err);
+                        callback(false);
                     }
-                   if(row.length === 1){
+                   else if(row.length === 1){
                        callback(true);
                       
                    }

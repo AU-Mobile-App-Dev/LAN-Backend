@@ -3,14 +3,35 @@ var sessions = require('../database/login-registration');
 var errorCodes = require('./error-codes.js');
 
 module.exports = function(app) {
-    // ===============================
-    // API REQUESTS for Users resource 
-    // ===============================
+    // ==================================
+    // API requests for newsfeed resource 
+    // ==================================
 
     app.get('/api/newsfeed/api=:apikey', function(req, res) {
         sessions.verifyKey(req.params.apikey, function(result) {
             if (result) {
-                newsfeed.getNewsfeed(function(result) {
+                newsfeed.getNewsFeedByApikey(req.params.apikey, function(result) {
+                    errorCodes.responseCodeHandler(result, function(foundError, code) {
+                        if (foundError) {
+                            res.json(code);
+                        } else {
+                            res.send(result);
+                        }
+                    });
+                });
+            } else {
+                res.json({
+                    403: "Unauthenticated API request for newsfeed"
+                });
+            }
+        });
+
+    });
+    
+    app.get('/api/newsfeed/id=:newsItemID/api=:apikey', function(req, res) {
+        sessions.verifyKey(req.params.apikey, function(result) {
+            if (result) {
+                newsfeed.getNewsFeedByID(req.params.newsItemID, function(result) {
                     errorCodes.responseCodeHandler(result, function(foundError, code) {
                         if (foundError) {
                             res.json(code);
@@ -32,10 +53,11 @@ module.exports = function(app) {
         sessions.verifyKey(req.params.apikey, function(result) {
             if (result) {
                 var newsfeedObject = {
-                    username: req.body.username,
-                    timestamp:
+                    apikey: req.params.apikey,
+                    timestamp: new Date().toISOString().slice(0, 19).replace('T', ' '),
+                    message: req.body.message
                 }
-                newsfeed.addNewsfeed(req.body.username, function(result) {
+                newsfeed.addNewsfeedItemByApikey(newsfeedObject, function(result) {
                     errorCodes.responseCodeHandler(result, function(foundError, code) {
                         if (foundError) {
                             res.json(code);
@@ -46,76 +68,54 @@ module.exports = function(app) {
                 });
             } else {
                 res.json({
-                    403: "Unauthenticated API request for friends list"
+                    403: "Unauthenticated API request for newsfeed"
+                });
+            }
+        });
+    });
+    
+    app.delete('/api/newsfeed/delete/:id/api=:apikey', function(req, res) {
+        sessions.verifyKey(req.params.apikey, function(result) {
+            if (result) {
+                var userObject = {
+                    apikey: req.params.apikey,
+                    newsfeedItemID: req.params.id
+                }
+                newsfeed.removeNewsfeedItemByApikey(userObject, function(result) {
+                    errorCodes.responseCodeHandler(result, function(foundError, code) {
+                        if (foundError) {
+                            res.json(code);
+                        } else {
+                            res.json(result);
+                        }
+                    });
+                });
+            } else {
+                res.json({
+                    403: "Unauthenticated API request for newsfeed"
                 });
             }
         });
     });
    
-    app.get('/api/users/:location/api=:apikey', function(req, res) {
-        sessions.verifyKey(req.params.apikey, function(result) {
-            if (result) {
-                geocoder.geocode(req.params.location, function(err, data) {
-                    if (err) {
-                        res.json({
-                            400: "Geocoder could not get the location, please check for syntax errors."
-                        });
-                    } else {
-                        var coordinates = {
-                            lat: data.results[0].geometry.location.lat,
-                            lon: data.results[0].geometry.location.lng
-                        };
-                        selectProfiles.getUserByLocation(coordinates, function(result) {
-                            errorCodes.responseCodeHandler(result, function(foundError, code) {
-                                if (foundError) {
-                                    res.json(code);
-                                } else {
-                                    res.json(result);
-                                }
-                            })
-                        });
-                    }
-                });
-            } else {
-                res.json({
-                    403: "Unauthenticated API request for friends list"
-                });
-            }
-        });
-    });
-
-    app.get('/api/users/friends/api=:apikey', function(req, res) {
-        sessions.verifyKey(req.params.apikey, function(result) {
-            if (result) {
-                selectProfiles.getFriends(req.params.username, function(result) {
-                    errorCodes.responseCodeHandler(result, function(foundError, code) {
-                        if (foundError) {
-                            res.json(code);
-                        } else {
-                            res.json(result);
-                        }
-                    });
-                });
-            } else {
-                res.json({
-                    403: "Unauthenticated API request for friends list"
-                });
-            }
-        });
-    });
-
+    
 
     // =======================
     // GET REQUESTS =========
     // =======================
 
     // =======================
-    // POST REQUESTS =========
+    // PUT REQUESTS =========
     // =======================
-    app.post('/users/friends', function(req, res) {
+    app.put('/newsfeed/add', function(req, res) {
         sessions.getSession(req.body.username, req.body.session, function(result) {
             if (result) {
-                selectProfiles.getFriends(req.body.username, function(result) {
+                 var newsfeedObject = {
+                    session: session,
+                    timestamp: new Date().toISOString().slice(0, 19).replace('T', ' '),
+                    message: req.body.message
+                }
+                newsfeed.addNewsfeedItemBySessionkey(newsfeedObject, function(result) {
                     errorCodes.responseCodeHandler(result, function(foundError, code) {
                         if (foundError) {
                             res.json(code);
@@ -136,6 +136,29 @@ module.exports = function(app) {
     // =======================
     // DELETE REQUESTS =======
     // =======================
+    app.delete('/newsfeed/delete/:id', function(req, res) {
+        sessions.verifyKey(req.body.session, function(result) {
+            if (result) {
+                var userObject = {
+                    apikey: req.body.session,
+                    newsfeedItemID: req.params.id
+                }
+                newsfeed.removeNewsfeedItemBySession(userObject, function(result) {
+                    errorCodes.responseCodeHandler(result, function(foundError, code) {
+                        if (foundError) {
+                            res.json(code);
+                        } else {
+                            res.json(result);
+                        }
+                    });
+                });
+            } else {
+                res.json({
+                    403: "Unauthenticated API request for newsfeed"
+                });
+            }
+        });
+    });
 
 
 
